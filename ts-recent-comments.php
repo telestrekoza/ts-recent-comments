@@ -46,7 +46,7 @@ class TSRecentComments extends \WP_Widget {
 		if($title)
 		    echo $before_title . $title . $after_title;
 		echo '<div class="textwidget">';
-		echo $this->output_recent_comments();
+		echo $this->output_recent_comments($instance['com_count']);
 		echo '</div>';
 		echo $after_widget;
 	}
@@ -55,6 +55,9 @@ class TSRecentComments extends \WP_Widget {
 	{
 		$instance = $old_instance;
 		$instance['title'] = strip_tags($new_instance['title']);
+		$com_count = $new_instance['com_count'];
+		if ($com_count > 0 && $com_count <= 20)
+		    $instance['com_count'] = $new_instance['com_count'];
 		return $instance;
 	}
 	
@@ -62,16 +65,21 @@ class TSRecentComments extends \WP_Widget {
 	{
 		if ( $instance ) {
 			$title = esc_attr( $instance[ 'title' ] );
+			$com_count = esc_attr( $instance[ 'com_count' ] );
 		} else {
 			$title = __( 'New title', 'text_domain' );
+			$com_count = 5;
 		}
 		echo '<p>';
 		echo '<label for="'. $this->get_field_id('title') .'">'. _e('Title:') .'</label>';
 		echo '<input class="widefat" id="'. $this->get_field_id('title') .'" name="'. $this->get_field_name('title') .'" type="text" value="'. $title .'" />';
+		echo '<label for="'. $this->get_field_id('com_count') .'">'. _e('Count:','ts_recent_comments') .'</label>';
+		echo '<input class="widefat" id="'. $this->get_field_id('com_count') .'" name="'. $this->get_field_name('com_count') .'" type="text" value="'. $com_count .'" />';
+
 		echo '</p>';
 	}
 	
-	function output_recent_comments($no_comments = 6, $comment_lenth = 3, $before = '<li>', $after = '</li>', $show_pass_post = false, $comment_style = 0)
+	function output_recent_comments($no_comments = 5, $comment_lenth = 3, $before = '<li>', $after = '</li>', $show_pass_post = false, $comment_style = 0)
 	{
 		global $wpdb;
 		
@@ -114,12 +122,12 @@ class TSRecentComments extends \WP_Widget {
 						$output .= " last comment_resume_last";
 					$output .= '">';
 					if($comment_second_part)
-						$output .= '<a href="#" title="раскрыть/скрыть" onclick="return togle_comment_resume(\'comment_resume_'.$comment->comment_ID.'\');" class="expand"><img src="/static/images/switch/exp_coll.png" width="16" hight="10" alt="раскрыть/скрыть"/></a>';
+						$output .= '<a href="#" title="раскрыть/скрыть" class="expand_comment"><img src="/static/images/switch/exp_coll.png" width="16" hight="10" alt="раскрыть/скрыть"/></a>';
 					$output .= $this->get_avatar($comment, $size='24');
 					$output .= $comment_excerpt;
 					$output .= '<a href="' . $permalink;
 					$output .= '" class="more" title="Узнать больше"> дальше</a>';
-					$output .= '<div class="clear"></div>';
+					//$output .= '<div class="clear"></div>';
 					$output .= '</div>';
 				}
 			}

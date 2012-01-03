@@ -25,3 +25,6 @@ msgstr "Последние комментарии Телестрекозы"
 msgid "Telestrekoza recent comments widget"
 msgstr "Виджет с последними комментариями на сайте Телестрекозы"
 
+#: ts-recent-comments.php:76
+msgid "Count:"
+msgstr "Количество:"
