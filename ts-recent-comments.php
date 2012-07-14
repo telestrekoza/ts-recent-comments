@@ -43,11 +43,38 @@ class TSRecentComments extends \WP_Widget {
 		extract($args);
 		$title = apply_filters('widget_title', $instance['title']);
 		echo $before_widget;
-		if($title)
-		    echo $before_title . $title . $after_title;
 		echo '<div class="textwidget">';
-		echo $this->output_recent_comments($instance['com_count']);
+		if($title) {
+			echo $before_title . $title . $after_title;
+		}
+		$rc_count = $_COOKIE["rc_com"] ? intval($_COOKIE["rc_com"]) : (int) $instance['com_count'];
+		if($rc_count > 20) {
+			$rc_count = 20;
+		}
+		if($rc_count < 5){
+			$rc_count = 5;
+		}
+		echo '<a href="#" id="recent_comments_options" title="кликнуть, чтоб развернуть опции последних комментариев"><img src="/static/images/options.png" width="" height="" alt="опции" /></a>';
+		echo '<div id="recent_comments_options_form" style="display: none;">';
+		echo '<form action="" method="get" id="recent_comments_form" name="recent_comments_form">';
+		echo '<label for="recent_comments_count">Показываемых:</label>';
+		echo '<select id="recent_comments_count" name="recent_comments_count">';
+		echo '<option value="5"';
+		if($rc_count<10) echo ' selected';
+		echo '>5</option>';
+		echo '<option value="10"';
+		if($rc_count>=10 && $rc_count<20) echo ' selected';
+		echo '>10</option>';
+		echo '<option value="20"';
+		if($rc_count>=20) echo ' selected';
+		echo '>20</option>';
+		echo '</select>';
+		echo '</form>';
 		echo '</div>';
+
+		echo '<div id="recent_comment_content">';
+		echo $this->output_recent_comments($rc_count);
+		echo '</div></div>';
 		echo $after_widget;
 	}
 	
@@ -57,7 +84,7 @@ class TSRecentComments extends \WP_Widget {
 		$instance['title'] = strip_tags($new_instance['title']);
 		$com_count = $new_instance['com_count'];
 		if ($com_count > 0 && $com_count <= 20)
-		    $instance['com_count'] = $new_instance['com_count'];
+			$instance['com_count'] = $new_instance['com_count'];
 		return $instance;
 	}
 	
@@ -101,7 +128,7 @@ class TSRecentComments extends \WP_Widget {
 				$comment_excerpt = join(" ",array_slice($words,0,$comment_lenth));
 				$comment_excerpt1 = join(" ",array_slice($words,$comment_lenth));
 				if(!empty($comment_excerpt1)) {
-					$comment_excerpt .= '&nbsp;<span id="comment_resume_'.$comment->comment_ID.'" class="hide">'.$comment_excerpt1;
+					$comment_excerpt .= '&nbsp;<span class="comment_extention" style="display:none;">'.$comment_excerpt1;
 					$comment_excerpt .= '</span>';
 					$comment_second_part = true;
 				} else
@@ -127,7 +154,6 @@ class TSRecentComments extends \WP_Widget {
 					$output .= $comment_excerpt;
 					$output .= '<a href="' . $permalink;
 					$output .= '" class="more" title="Узнать больше"> дальше</a>';
-					//$output .= '<div class="clear"></div>';
 					$output .= '</div>';
 				}
 			}
@@ -215,8 +241,8 @@ class TSRecentComments extends \WP_Widget {
 }
 
 add_action('widgets_init', function() {
-    load_plugin_textdomain('ts_recent_comments', false, basename( dirname( __FILE__ ) ) . '/languages' );
-    return register_widget('ts\widgets\TSRecentComments');
+	load_plugin_textdomain('ts_recent_comments', false, basename( dirname( __FILE__ ) ) . '/languages' );
+	return register_widget('ts\widgets\TSRecentComments');
 });
 
 
